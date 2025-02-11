@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Will You Be My Valentine?</title>
+    <style>
+        body {
+            background-color: pink;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 110vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            text-align: center;
+        }
+        
+        .gif-container {
+            margin: 20px 0;
+        }
+        
+        .gif-container img {
+            max-width: 300px;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        h1 {
+            color: red;
+            font-size: 48px;
+            margin: 20px 0;
+        }
+        
+        .button-container {
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 15px 30px;
+            margin: 0 10px;
+            font-size: 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: bold;
+        }
+        
+        #yesBtn {
+            background-color: #4CAF50;
+        }
+        
+        #noBtn {
+            background-color: #ff4444;
+        }
+        
+        button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio elements -->
+    <audio id="openSound" src="soundA.mp3"></audio>
+    <audio id="yesSound" src="soundB.mp3"></audio>
+    <audio id="noSound1" src="soundC.mp3"></audio>
+    <audio id="noSound2" src="soundD.mp3"></audio>
+    <audio id="noSound3" src="soundE.mp3"></audio>
+    <audio id="noSound4" src="soundF.mp3"></audio>
+    <audio id="noSound5" src="soundG.mp3"></audio>
+    <audio id="noSound6" src="soundH.mp3"></audio>
+    <audio id="noSound7" src="soundI.mp3"></audio>
+
+    <div class="container">
+        <div class="gif-container">
+            <img id="mainGif" src="gif0.gif" alt="Valentine's gif">
+        </div>
+        <h1 id="message">Will you be my valentine?</h1>
+        <div class="button-container">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+
+    <script>
+        // Data structures for no responses
+        const noGifs = [
+            "gif2.gif",
+            "gif3.gif",
+            "gif4.gif",
+            "gif5.gif"
+        ];
+        
+        const noMessages = [
+            "Are you sure?",
+            "Please reconsider pookie",
+            "Pookie please? :')",
+            "Don't be like that pookie!",
+            "Uk you want to!",
+            "PLEASEPLEASEPLEASEPLEASEPLEASEPLESE",
+            "I think you misclicked it's okay tho I'll make the button smaller for you :3",
+            "Please? 🥺"
+        ];
+        
+        // Get DOM elements
+        const mainGif = document.getElementById('mainGif');
+        const message = document.getElementById('message');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        
+        // Get audio elements
+        const openSound = document.getElementById('openSound');
+        const yesSound = document.getElementById('yesSound');
+        const noSounds = [
+            document.getElementById('noSound1'),
+            document.getElementById('noSound2'),
+            document.getElementById('noSound3'),
+            document.getElementById('noSound4'),
+            document.getElementById('noSound5'),
+            document.getElementById('noSound6'),
+            document.getElementById('noSound7')
+        ];
+        
+        // Array of all audio elements for easy management
+        const allSounds = [openSound, yesSound, ...noSounds];
+        
+        let currentSize = 100; // Current size of no button in percentage
+        const minSize = 50; // Minimum size in percentage
+        let lastGifIndex = -1; // Track the last shown GIF index
+        let lastMessageIndex = -1; // Track the last shown message index
+        let lastNoSoundIndex = -1; // Track the last played no sound index
+        let hasPlayedOpenSound = false; // Track if opening sound has played
+
+        // Function to stop all sounds
+        function stopAllSounds() {
+            allSounds.forEach(sound => {
+                sound.pause();
+                sound.currentTime = 0;
+            });
+        }
+
+        // Function to play a sound (stops all others first)
+        function playSound(sound) {
+            stopAllSounds();
+            sound.play().catch(error => {
+                console.log("Audio playback failed:", error);
+            });
+        }
+        
+        // Play opening sound when page loads
+        window.addEventListener('load', () => {
+            if (!hasPlayedOpenSound) {
+                playSound(openSound);
+                hasPlayedOpenSound = true;
+            }
+        });
+        
+        yesBtn.addEventListener('click', () => {
+            mainGif.src = "gif1.gif";
+            message.textContent = "YAYYYYYYYY :3 - Hein";
+            noBtn.style.display = 'none';
+            yesBtn.style.display = 'none';
+            playSound(yesSound);
+        });
+        
+        noBtn.addEventListener('click', () => {
+            // Get a new random GIF index that's different from the last one
+            let newGifIndex;
+            do {
+                newGifIndex = Math.floor(Math.random() * noGifs.length);
+            } while (newGifIndex === lastGifIndex && noGifs.length > 1);
+            
+            lastGifIndex = newGifIndex;
+            mainGif.src = noGifs[newGifIndex];
+            
+            // Get a new random message index that's different from the last one
+            let newMessageIndex;
+            do {
+                newMessageIndex = Math.floor(Math.random() * noMessages.length);
+            } while (newMessageIndex === lastMessageIndex && noMessages.length > 1);
+            
+            lastMessageIndex = newMessageIndex;
+            noBtn.textContent = noMessages[newMessageIndex];
+            
+            // Get a new random no sound that's different from the last one
+            let newSoundIndex;
+            do {
+                newSoundIndex = Math.floor(Math.random() * noSounds.length);
+            } while (newSoundIndex === lastNoSoundIndex && noSounds.length > 1);
+            
+            lastNoSoundIndex = newSoundIndex;
+            playSound(noSounds[newSoundIndex]);
+            
+            // Shrink button
+            if (currentSize > minSize) {
+                currentSize -= 10;
+                noBtn.style.transform = `scale(${currentSize/100})`;
+            }
+        });
+    </script>
+</body>
+</html>
